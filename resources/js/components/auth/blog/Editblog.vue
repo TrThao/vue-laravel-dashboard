@@ -46,7 +46,7 @@ export default {
     setup() {
         const blog = ref({ id: '', title: '', content: '', image: '', category_id: '' });
         const errors = ref({ title: '', content: '', image: '' });
-        const categories = ref([]); // Khai báo biến categories
+        const categories = ref([]);
 
         const route = useRoute();
         const router = useRouter();
@@ -72,7 +72,7 @@ export default {
             const formData = new FormData();
             formData.append('title', blog.value.title);
             formData.append('content', blog.value.content);
-            formData.append('category_id', blog.value.category_id); // Thêm category_id vào formData
+            formData.append('category_id', blog.value.category_id);
             if (blog.value.image) {
                 formData.append('image', blog.value.image);
             }

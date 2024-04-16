@@ -17,7 +17,7 @@ class Authenticate extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'password' => 'required',
-            'c_password'=> 'required| same:password'
+            'c_password' => 'required| same:password'
         ]);
         if ($validator->fails()) {
             $response = [
@@ -26,15 +26,16 @@ class Authenticate extends Controller
             ];
             return response()->json($response, 400);
         }
-            $input = $request->all();
-            $input['password'] = bcrypt($input['password']);
-            $user = User::create($input);
+        $input = $request->all();
+        $input['password'] = bcrypt($input['password']);
+        $user = User::create($input);
 
-        $success['token'] = $user->createToken('myApp')->plainTextToken;
-        $success['name'] = $user->name;
+        // $success['token'] = $user->createToken('myApp')->plainTextToken;
+        $success['user'] = $user;
+        // dd($success);
 
         $response = [
-            'success' => 'true',
+            'success' => true,
             'data' => $success,
             'message' => 'User register Success'
 
@@ -44,27 +45,24 @@ class Authenticate extends Controller
     public function login(Request $request)
     {
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user  = Auth::user();
-            $success = [
-                'token' => $user->createToken('myApp')->plainTextToken
-            ];
-            $success['name'] = $user->name;
-
+            $user  = Auth::user()->load('roles.permissions');
+            $success['token'] = $user->createToken('myApp')->plainTextToken;
+            $success['user'] = $user;
+            // dd($success);
             $response = [
                 'success' => true,
                 'data' => $success,
                 'message' => 'Đăng nhập thành công'
 
             ];
-            return response()->json($response,200);
-        }else {
+            return response()->json($response, 200);
+        } else {
             $response = [
-                'success' => false,              
+                'success' => false,
                 'message' => 'Thông tin tài khoản hoặc mật khẩu không đúng'
 
             ];
             return response()->json($response);
         }
     }
-   
 }

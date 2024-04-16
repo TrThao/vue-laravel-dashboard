@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '../store/index.js'
 import Home from '../pages/Home.vue';
 import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
@@ -19,6 +20,11 @@ import CreateRoles from '../components/admin/role/AddRole.vue'
 import Permissions from '../components/admin/permission/Permission.vue'
 import Editpermission from '../components/admin/permission/Editpermission.vue'
 import Createpermissions from '../components/admin/permission/Addpermiss.vue'
+
+
+
+// import { useStore } from 'vuex'
+//  const store = useStore();
 const routes = [
   {
     path: '/',
@@ -54,7 +60,8 @@ const routes = [
     path: '/blog/create',
     name: 'create_blog',
     component: CreateBlog,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
+    permissions:'category-create'
   },
     {
     path: '/blog/edit/:id',
@@ -134,12 +141,21 @@ const routes = [
     component: Editpermission,
     meta: { requiresAuth: true }
   },
-         {
+  // {
+  //   path: '/permissions',
+  //   name: 'AdminOnlyRoute',
+  //  component: Editpermission,
+  //   meta: {
+  //       requiresAuth: true
+  //   }
+  // },
+   {
     path: '/permissions/create',
     name: 'create_permissions',
     component: Createpermissions,
     meta: { requiresAuth: true }
   },
+
 ];
 
 const router = createRouter({
@@ -147,17 +163,20 @@ const router = createRouter({
   routes
 });
 
-router.beforeEach((to, from) => {
-  if (to.meta.requiresAuth && !localStorage.getItem('token')) {
-    return {
-      name: 'Login'
-    };
-  }
-  if (to.meta.requiresAuth == false && localStorage.getItem('token')) {
-    return {
-      name: 'Dashboard'
-    };
+
+
+router.beforeEach((to, from, next) => {
+  const user = store.getters.getUser;
+  const token = store.getters.getToken;
+
+  console.log(user);
+
+  if (to.meta.requiresAuth && !token) {
+    next({ name: 'Login' });
+  } else {
+    next();
   }
 });
 
 export default router;
+

@@ -31,7 +31,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
+import store from '../store/index'
 
 export default {
     name: 'Navbar',
@@ -39,13 +39,14 @@ export default {
         ...mapGetters(['getToken'])
     },
     setup() {
-        const store = useStore();
+
         const router = useRouter();
         function logout() {
+
             store.dispatch('removeToken');
             router.push({ name: 'Home' })
         }
-        
+
         return {
             logout
         }

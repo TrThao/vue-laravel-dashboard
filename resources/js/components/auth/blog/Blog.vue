@@ -13,12 +13,12 @@
                             <span v-if="categories.length > 0">
                                 {{ getCategoryName(blog.category_id) }}
                             </span>
-                            <router-link :to="{ name: 'blogedit', params: { id: blog.id } }"
-                                class="btn btn-link text-primary">
+                            <router-link v-if="userPermissions.includes('blog-edit')"
+                                :to="{ name: 'blogedit', params: { id: blog.id } }" class="btn btn-link text-primary">
                                 <i class="fas fa-edit"></i>
                             </router-link>
-                            <button class="delete-button btn" @click="deleteBlog(blog.id)"><i
-                                    class="fa-solid fa-trash"></i></button>
+                            <button v-if="userPermissions.includes('blog-delete')" class="delete-button btn"
+                                @click="deleteBlog(blog.id)"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -29,18 +29,22 @@
 </template>
 
 <script>
+import { ref } from 'vue';
+
 import { mapGetters } from 'vuex';
 import axios from 'axios';
 export default {
- 
+
     computed: {
-        ...mapGetters(['getToken'])
+        ...mapGetters(['getToken', 'getUser']),
     },
     data() {
 
         return {
             blogs: [],
             categories: [],
+            userPermissions: ref([])
+
         }
     },
     methods: {
@@ -67,7 +71,6 @@ export default {
         async fetchData() {
             try {
                 const response = await axios.get('/api/blog');
-                console.log(response)
                 this.blogs = response.data;
             } catch (error) {
                 console.error('Error fetching blogs:', error);
@@ -76,21 +79,41 @@ export default {
         async fetchCategories() {
             try {
                 const response = await axios.get('/api/category');
-                console.log(response);
                 this.categories = response.data;
             } catch (error) {
                 console.error('Error fetching categories:', error);
             }
         },
+        async fetchUserPermissions() {
+            try {
+                const user = this.getUser;
+                if (user && user?.roles) {
+                    user.roles.forEach(role => {
+                        if (role.permissions) {
 
+                            role.permissions.forEach(permission => {
+
+                                this.userPermissions.push(permission.name);
+                                console.log(this.userPermissions);
+                            });
+                        }
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error fetching user permissions:', error);
+            }
+        },
         getCategoryName(categoryId) {
             const category = this.categories.find(cat => cat.id === categoryId);
             return category ? category.name : '';
         },
+
     },
     created() {
         this.fetchData();
         this.fetchCategories();
+        this.fetchUserPermissions()
 
     },
 };

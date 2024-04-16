@@ -21,7 +21,7 @@
             <div class="form-group">
                 <label for="role">Vai trò:</label>
                 <select class="form-control" v-model="selectedRole" id="role">
-                    <option v-for="(role, index) in roles" :key="index" :value="role.id">
+                    <option v-for="role in roles" :key="role.id" :value="role.id">
                         {{ role.name }}
                     </option>
                 </select>
@@ -38,19 +38,17 @@ import axios from 'axios';
 
 export default {
     setup() {
-        const user = ref({ id: null, name: '', email: '', password: '' });
+        const user = ref({ id: null, name: '', email: '', password: '', role_id: '' });
         const roles = ref([]);
+        const selectedRole = ref('');
         const route = useRoute();
-        const selectedRole = ref([]);
         user.value.id = route.params.id;
 
         const router = useRouter();
+
         const submitForm = async () => {
-            const selectedRoleIds = selectedRole.value;
-            console.log(selectedRoleIds);
             try {
-                await axios.post(`/api/user/${user.value.id}`, { ...user.value, role_id: selectedRoleIds });
-               
+                await axios.post(`/api/user/${user.value.id}`, { ...user.value, role_id: selectedRole.value });
                 router.push('/user');
             } catch (error) {
                 console.error("Error submitting form:", error);
@@ -61,6 +59,7 @@ export default {
             try {
                 const res = await axios.get('/api/roles');
                 roles.value = res.data;
+                // console.log(roles.value)
             } catch (error) {
                 console.error('Error fetching roles:', error);
             }
@@ -69,15 +68,16 @@ export default {
         onMounted(async () => {
             try {
                 const response = await axios.get(`/api/user/${user.value.id}`);
+                console.log(response);
                 user.value.name = response.data.name;
                 user.value.email = response.data.email;
-                selectedRole.value = response.data.role_id;
+                // user.value.role_id = response.data.role_id;
+                // selectedRole.value = response.data.role_id;
             } catch (error) {
                 console.error("Error", error);
             }
         });
 
-        // Gọi fetchRoles để lấy danh sách vai trò khi component được mounted
         fetchRoles();
 
         return { user, roles, submitForm, selectedRole };

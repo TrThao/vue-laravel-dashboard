@@ -22,62 +22,65 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::controller(Authenticate::class)->group(function () {
     Route::post('login', 'login');
     Route::post('register', 'register');
 });
-Route::group(['middleware' => ['role:admin|editor']], function () {
-    //category
-    Route::get('/category', [AuthCategoryController::class, 'index']);
-    Route::post('create/category', [AuthCategoryController::class, 'store']);
-    Route::get('/category/{id}', [AuthCategoryController::class, 'show']);
-    Route::put('/category/{category}', [AuthCategoryController::class, 'update']);
-    Route::delete('/category/{category}', [AuthCategoryController::class, 'delete']);
-});
 
-Route::group(['middleware' => ['role:admin']], function () {
-    Route::get('/blog', [AuthBlogController::class, 'index']);
-    Route::post('create/blog', [AuthBlogController::class, 'store']);
-    Route::get('/blog/{id}', [AuthBlogController::class, 'show']);
-    Route::post('/blog/{id}', [AuthBlogController::class, 'update']);
-    Route::delete('/blog/{blog}', [AuthBlogController::class, 'delete']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::group(['middleware' => ['role:admin|editor']], function () {
+        //category
+        Route::get('/category', [AuthCategoryController::class, 'index']);
+        Route::post('create/category', [AuthCategoryController::class, 'store']);
+        Route::get('/category/{id}', [AuthCategoryController::class, 'show']);
+        Route::put('/category/{category}', [AuthCategoryController::class, 'update']);
+        Route::delete('/category/{category}', [AuthCategoryController::class, 'delete']);
 
 
 
-    //user
-    Route::get('/user', [AuthUserController::class, 'index']);
-    Route::post('create/user', [AuthUserController::class, 'store']);
-    Route::get('/user/{id}', [AuthUserController::class, 'show']);
-    Route::post('/user/{user}', [AuthUserController::class, 'update']);
-    Route::delete('/user/{user}', [AuthUserController::class, 'delete']);
+        Route::get('/blog', [AuthBlogController::class, 'index']);
+        Route::post('create/blog', [AuthBlogController::class, 'store']);
+        Route::get('/blog/{id}', [AuthBlogController::class, 'show']);
+        Route::post('/blog/{id}', [AuthBlogController::class, 'update'])->middleware(['permission:blog-edit']);
+        Route::delete('/blog/{blog}', [AuthBlogController::class, 'delete']);
+    });
 
-    //user update pass
-    Route::post('changepassword/user/{user}', [ChangePasswordController::class, 'updatePassuser']);
+    Route::group(['middleware' => ['role:admin']], function () {
+        //user
+        Route::get('/user', [AuthUserController::class, 'index']);
+        Route::post('create/user', [AuthUserController::class, 'store']);
+        Route::get('/user/{id}', [AuthUserController::class, 'show']);
+        Route::post('/user/{user}', [AuthUserController::class, 'update']);
+        Route::delete('/user/{user}', [AuthUserController::class, 'delete']);
 
-
-    // Role
-    Route::get('/roles', [RoleController::class, 'index']);
-    Route::post('create/roles', [RoleController::class, 'store']);
-    Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
-    Route::post('/update/roles/{id}', [RoleController::class, 'update']);
-    Route::get('/roles/{id}', [RoleController::class, 'show']);
-
-
-
-    Route::get('/permissions', [PermissionController::class, 'index']);
-    Route::post('/create/permissions', [PermissionController::class, 'store']);
-    Route::get('/permissions/{id}', [PermissionController::class, 'show']);
-    Route::post('/update/permissions/{id}', [PermissionController::class, 'update']);
-    Route::delete('/permissions/{id}', [PermissionController::class, 'destroy']);
+        //user update pass
+        Route::post('changepassword/user/{user}', [ChangePasswordController::class, 'updatePassuser']);
 
 
+        // Role
+        Route::get('/roles', [RoleController::class, 'index']);
+        Route::post('create/roles', [RoleController::class, 'store']);
+        Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
+        Route::post('/update/roles/{id}', [RoleController::class, 'update']);
+        Route::get('/roles/{id}', [RoleController::class, 'show']);
 
 
-    Route::get('/roles/{role}/permissions', [RolePermissionController::class, 'getRolePermissions']);
 
-    Route::post('/roles/{role}/permissions', [RolePermissionController::class, 'assignPermissions']);
+        Route::get('/permissions', [PermissionController::class, 'index']);
+        Route::post('/create/permissions', [PermissionController::class, 'store']);
+        Route::get('/permissions/{id}', [PermissionController::class, 'show']);
+        Route::post('/update/permissions/{id}', [PermissionController::class, 'update']);
+        Route::delete('/permissions/{id}', [PermissionController::class, 'destroy']);
+
+
+
+
+        Route::get('/roles/{role}/permissions', [RolePermissionController::class, 'getRolePermissions']);
+
+        Route::post('/roles/{role}/permissions', [RolePermissionController::class, 'assignPermissions']);
+    });
 });

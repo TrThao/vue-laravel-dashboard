@@ -22,11 +22,11 @@
                             <td>{{ cate.name }}</td>
                             <td>{{ cate.description }}</td>
                             <td class="btn-action">
-                                <router-link class="edit-link btn"
+                                <router-link class=" edit-link btn"
                                     :to="{ name: 'categoryedit', params: { id: cate.id } }"> <i class="fas fa-edit"></i>
                                 </router-link>
-                                <button class="delete-button btn" @click="deleteCategory(cate.id)"><i
-                                        class="fa-solid fa-trash"></i>
+                                <button class="delete-button btn" @click="deleteCategory(cate.id)">
+                                    <i class="fa-solid fa-trash"></i>
                                 </button>
                             </td>
                         </tr>
@@ -34,19 +34,19 @@
                 </table>
             </div>
         </div>
-        <div class="sidebar">
-            <!-- Nội dung của cột sidebar thứ hai -->
-        </div>
     </div>
 </template>
 
 
 <script>
 import axios from 'axios';
+
 export default {
     data() {
         return {
             categorys: [],
+      
+
         }
     },
     methods: {
@@ -57,13 +57,13 @@ export default {
             } catch (error) {
                 console.error('Error deleting category:', error);
             }
-        }
+        },
     },
     async created() {
         try {
             const response = await axios.get('/api/category');
-            console.log(response)
             this.categorys = response.data;
+
         } catch (error) {
             console.error('Lỗi :', error);
         }

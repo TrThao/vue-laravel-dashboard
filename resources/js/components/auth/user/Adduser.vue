@@ -35,7 +35,7 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex'
-const router = useRouter();
+
 export default {
     setup() {
         const router = useRouter();

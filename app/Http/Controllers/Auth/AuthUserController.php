@@ -15,6 +15,7 @@ class AuthUserController extends Controller
     {
 
         $users = User::with('roles')->get();
+        // dd($users);
         return response()->json($users, 200);
     }
     public function store(Request $request)

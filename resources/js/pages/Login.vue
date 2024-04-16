@@ -23,11 +23,10 @@
 <script>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex'
+import store from '../store/index'
 export default {
     setup() {
         const router = useRouter();
-        const store = useStore();
         let form = reactive({
             email: '',
             password: '',
@@ -38,6 +37,10 @@ export default {
                 if (res.data.success) {
                     console.log(res);
                     store.dispatch('setToken', res.data.data.token)
+                    store.dispatch('setUser', res.data.data.user)
+
+                    // localStorage.setItem('token', res.data.data.token)
+
                     alert('Đăng nhập thành công');
                     router.push({ name: 'Home' });
                 }

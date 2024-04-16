@@ -10,7 +10,7 @@ use Spatie\Permission\Models\Permission;
 class RoleController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
         $roles = Role::all();
         return response()->json($roles);

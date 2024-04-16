@@ -22,7 +22,7 @@
                         <label for="c_password">Confirm Password :</label>
                         <input type="password" class="form-control" id="c_password" v-model="form.c_password">
                     </div>
-                    <button type=" submit" class="btn btn-primary">Register</button>
+                    <button type="submit" class="btn btn-primary">Register</button>
                 </form>
             </div>
         </div>
@@ -32,12 +32,10 @@
 <script>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex'
-const router = useRouter();
+import axios from 'axios'; // Import axios library
 export default {
     setup() {
         const router = useRouter();
-        const store = useStore();
         let form = reactive({
             name: '',
             email: '',
@@ -46,17 +44,16 @@ export default {
         });
         let errors = ref([])
         const register = async () => {
-            await axios.post('/api/register', form).then(res => {
+            try {
+                const res = await axios.post('/api/register', form);
                 if (res.data.success) {
-                    store.dispatch('setToken', res.data.data.token);
                     alert('Đăng kí thành công');
-                    router.push({ name: 'Home' });
+                    router.push({ name: 'Login' });
                 }
-            }).catch(e => {
-                // errors.value = e.response.data.message;
-                console.log(e)
+            } catch (e) {
 
-            })
+                console.log(e)
+            }
         }
         return {
             form,
